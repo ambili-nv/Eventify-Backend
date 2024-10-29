@@ -90,12 +90,7 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 const userRoutes = require('./routes/userRoutes'); // Import your user routes
 const adminRoutes = require('./routes/adminRoutes');
-const Slot = require('./model/SlotModal');
-const Booking = require('./model/BookingModal');
-const bodyParser = require('body-parser'); // Import body-parser
-const Stripe = require('stripe');
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY); // Initialize Stripe
-const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET; // Your Stripe webhook secret
+
 
 dotenv.config();
 
@@ -123,44 +118,7 @@ app.use(express.json());
 app.use('/api', userRoutes); // Add this line to use user routes
 app.use('/api', adminRoutes); // Add this line to use admin routes
 
-// Webhook route for handling Stripe events
-app.post('/webhook', bodyParser.raw({ type: 'application/json' }), async (req, res) => {
-    const sig = req.headers['stripe-signature'];
 
-    let event;
-
-    try {
-        event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
-    } catch (err) {
-        console.log(`Webhook Error: ${err.message}`);
-        return res.status(400).send(`Webhook Error: ${err.message}`);
-    }
-
-    // Handle the checkout.session.completed event
-    if (event.type === 'checkout.session.completed') {
-        const session = event.data.object;
-
-        const { serviceId, userId, selectedDate } = session.metadata; // Pass userId and other data in metadata
-
-        // Create a new booking
-        const booking = await Booking.create({
-            user: userId,
-            service: serviceId,
-            paymentStatus: 'completed',
-            bookingStatus: 'confirmed',
-        });
-
-        // Update the corresponding slot to booked
-        await Slot.findOneAndUpdate(
-            { service: serviceId, date: selectedDate },
-            { isBooked: true }
-        );
-
-        console.log(`Booking created: ${booking.id}`);
-    }
-
-    res.status(200).send('Received');
-});
 
 // Start the server
 const PORT = process.env.PORT || 3000;
