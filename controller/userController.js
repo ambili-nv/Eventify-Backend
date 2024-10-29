@@ -179,8 +179,10 @@ const createStripeSession = async (booking, price, selectedDate) => {
             },
         ],
         mode: 'payment',
-        success_url: `http://localhost:5173/success/${booking._id}`, 
-        cancel_url: 'http://localhost:5173/cancel',
+        success_url: `https://eventify-frontend-pi.vercel.app/success/${booking._id}`, 
+        // success_url: `http://localhost:5173/success/${booking._id}`, 
+        cancel_url: 'https://eventify-frontend-pi.vercel.app/cancel',
+        // cancel_url: 'http://localhost:5173/cancel',
     });
 
     return session; 
