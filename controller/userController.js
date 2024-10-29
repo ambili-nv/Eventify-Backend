@@ -123,7 +123,7 @@ const checkAvailability = async(req,res)=>{
     }
 }
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+const stripe = new Stripe("sk_test_51PaimnG8EaTCVCc3NGavGVvMCzXTACF41BI6zSJVd5wVQcTR1JB5E7cQn8zOD8cYfNjW4TkmuGMS61dkawv7W76r00pBRMB7u5");
 
 const bookService = async (req, res) => {
     const { serviceId, selectedDate, price } = req.body; 
